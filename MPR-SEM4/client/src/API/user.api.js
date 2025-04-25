@@ -2,7 +2,7 @@ import axios from 'axios'
 
 
 const userApi = axios.create({
-    baseURL: "http://localhost:8000"
+    baseURL: "https://imagin-ai-4lk2.vercel.app"
 })
 
 
