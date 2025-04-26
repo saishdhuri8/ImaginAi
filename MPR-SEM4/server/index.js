@@ -8,7 +8,7 @@ import userRoute from "./routes/userRoutes.js";
 
 const app = express();
 app.use(cors({
-    origin: "https://imagin-ai-pearl.vercel.app",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
