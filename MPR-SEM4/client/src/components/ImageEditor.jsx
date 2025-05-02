@@ -31,29 +31,50 @@ const ImageEditor = ({ imageUrl, onClose }) => {
     const [prompt, setprompt] = useState("");
     const [aipro, setaipro] = useState("");
 
+
     useEffect(() => {
         setEditedUrl(imageUrl);
         setaipro("");
         setprompt("");
     }, [mode]);
 
-    const applyFilter = async (filter) => {
-        setLoading(true);
-        setSelectedFilter(filter);
-        const [base, params] = imageUrl.split("/upload/");
-        const editedImageUrl = `${base}/upload/${filter}/${params}`;
+    // const applyFilter = async (filter) => {
+    //     setLoading(true);
+    //     setSelectedFilter(filter);
+    //     const [base, params] = imageUrl.split("/upload/");
+    //     const editedImageUrl = `${base}/upload/${filter}/${params}`;
 
-        try {
-            const res = await axios.get(editedImageUrl);
-            if (res.status === 200) {
-                setEditedUrl(editedImageUrl);
-            }
-        } catch (error) {
-            console.error("Failed to apply filter:", error);
-        } finally {
-            setLoading(false);
+    //     try {
+    //         const res = await axios.get(editedImageUrl);
+    //         if (res.status === 200) {
+    //             setEditedUrl(editedImageUrl);
+    //         }
+    //     } catch (error) {
+    //         console.error("Failed to apply filter:", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+    const applyFilter = async (filter) => {
+    setLoading(true);
+    setSelectedFilter(filter);
+    const secureUrl = imageUrl.replace('http://', 'https://');
+    const [base, params] = secureUrl.split("/upload/");
+    const editedImageUrl = `${base}/upload/${filter}/${params}`;
+
+    try {
+        const res = await axios.get(editedImageUrl);
+        if (res.status === 200) {
+            setEditedUrl(editedImageUrl);
         }
-    };
+    } catch (error) {
+        console.error("Failed to apply filter:", error);
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     const applyAIFeature = async (aiFeature) => {
         setLoading(true);
@@ -64,6 +85,8 @@ const ImageEditor = ({ imageUrl, onClose }) => {
         const maxAttempts = 20;
 
         const ai_interval = setInterval(async () => {
+
+            
             try {
                 const res = await axios.get(aiImageUrl);
                 if (res.status === 200) {
@@ -99,6 +122,7 @@ const ImageEditor = ({ imageUrl, onClose }) => {
             console.error("Download failed:", error);
         }
     };
+// https://res.cloudinary.com/dnbm8mudh/image/upload/e_grayscale/v1745606345/qur2mxgevdp4htm1ysn0.avif
 
     const applyBackgroundReplace = async () => {
         if (prompt.length == 0 || aipro !== "BackGround Replace") return;
