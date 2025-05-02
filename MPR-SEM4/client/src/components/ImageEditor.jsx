@@ -38,23 +38,6 @@ const ImageEditor = ({ imageUrl, onClose }) => {
         setprompt("");
     }, [mode]);
 
-    // const applyFilter = async (filter) => {
-    //     setLoading(true);
-    //     setSelectedFilter(filter);
-    //     const [base, params] = imageUrl.split("/upload/");
-    //     const editedImageUrl = `${base}/upload/${filter}/${params}`;
-
-    //     try {
-    //         const res = await axios.get(editedImageUrl);
-    //         if (res.status === 200) {
-    //             setEditedUrl(editedImageUrl);
-    //         }
-    //     } catch (error) {
-    //         console.error("Failed to apply filter:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     const applyFilter = async (filter) => {
     setLoading(true);
@@ -76,36 +59,36 @@ const ImageEditor = ({ imageUrl, onClose }) => {
 };
 
 
-    const applyAIFeature = async (aiFeature) => {
-        setLoading(true);
-        const [base, params] = imageUrl.split("/upload/");
-        const aiImageUrl = `${base}/upload/${aiFeature}/${params}`;
+const applyAIFeature = async (aiFeature) => {
+    setLoading(true);
+    const secureUrl = imageUrl.replace("http://", "https://");
+    const [base, params] = secureUrl.split("/upload/");
+    const aiImageUrl = `${base}/upload/${aiFeature}/${params}`;
 
-        let count = 0;
-        const maxAttempts = 20;
+    let count = 0;
+    const maxAttempts = 20;
 
-        const ai_interval = setInterval(async () => {
-
-            
-            try {
-                const res = await axios.get(aiImageUrl);
-                if (res.status === 200) {
-                    clearInterval(ai_interval);
-                    setEditedUrl(aiImageUrl);
-                    setLoading(false);
-                }
-            } catch (error) {
-                if (error.response?.status === 403) {
-                    console.log(`Attempt ${count + 1}: Retrying...`);
-                }
-            }
-
-            if (++count >= maxAttempts) {
+    const ai_interval = setInterval(async () => {
+        try {
+            const res = await axios.get(aiImageUrl);
+            if (res.status === 200) {
                 clearInterval(ai_interval);
+                setEditedUrl(aiImageUrl);
                 setLoading(false);
             }
-        }, 3000);
-    };
+        } catch (error) {
+            if (error.response?.status === 403) {
+                console.log(`Attempt ${count + 1}: Retrying...`);
+            }
+        }
+
+        if (++count >= maxAttempts) {
+            clearInterval(ai_interval);
+            setLoading(false);
+        }
+    }, 3000);
+};
+
     
 
     const downloadImage = async () => {
@@ -124,36 +107,40 @@ const ImageEditor = ({ imageUrl, onClose }) => {
     };
 // https://res.cloudinary.com/dnbm8mudh/image/upload/e_grayscale/v1745606345/qur2mxgevdp4htm1ysn0.avif
 
-    const applyBackgroundReplace = async () => {
-        if (prompt.length == 0 || aipro !== "BackGround Replace") return;
-        setLoading(true);
-        const [base, params] = imageUrl.split("/upload/");
-        let finalPrompt = prompt.trim().replaceAll(/\s+/g, ' ').replaceAll(' ', "%20");
-        const aiImageUrl = `${base}/upload/${AI_PRO_FEATURES[0].value}:prompt_${finalPrompt}/${params}`;
+const applyBackgroundReplace = async () => {
+    if (prompt.length === 0 || aipro !== "BackGround Replace") return;
 
-        let count = 0;
-        const maxAttempts = 20;
+    setLoading(true);
+    const secureUrl = imageUrl.replace("http://", "https://");
+    const [base, params] = secureUrl.split("/upload/");
+    
+    let finalPrompt = prompt.trim().replaceAll(/\s+/g, ' ').replaceAll(' ', "%20");
+    const aiImageUrl = `${base}/upload/${AI_PRO_FEATURES[0].value}:prompt_${finalPrompt}/${params}`;
 
-        const ai_interval = setInterval(async () => {
-            try {
-                const res = await axios.get(aiImageUrl);
-                if (res.status === 200) {
-                    clearInterval(ai_interval);
-                    setEditedUrl(aiImageUrl);
-                    setLoading(false);
-                }
-            } catch (error) {
-                if (error.response?.status === 403) {
-                    console.log(`Attempt ${count + 1}: Retrying...`);
-                }
-            }
+    let count = 0;
+    const maxAttempts = 20;
 
-            if (++count >= maxAttempts) {
+    const ai_interval = setInterval(async () => {
+        try {
+            const res = await axios.get(aiImageUrl);
+            if (res.status === 200) {
                 clearInterval(ai_interval);
+                setEditedUrl(aiImageUrl);
                 setLoading(false);
             }
-        }, 5000);
-    };
+        } catch (error) {
+            if (error.response?.status === 403) {
+                console.log(`Attempt ${count + 1}: Retrying...`);
+            }
+        }
+
+        if (++count >= maxAttempts) {
+            clearInterval(ai_interval);
+            setLoading(false);
+        }
+    }, 5000);
+};
+
 
     const handleBackgroundReplace = () => {
         setaipro(AI_PRO_FEATURES[0].name);
