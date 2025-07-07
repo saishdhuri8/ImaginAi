@@ -17,10 +17,10 @@ export const uploadToCloudinary = async (localPath) => {
         if (!localPath) return null;
 
         // In serverless environments, ensure files are placed in /tmp
-        // const tempFilePath = path.join('/tmp', path.basename(localPath));
+        const tempFilePath = path.join('/tmp', path.basename(localPath));
 
         // Copy the file to the /tmp directory
-        // fs.copyFileSync(localPath, tempFilePath);
+        fs.copyFileSync(localPath, tempFilePath);
 
         // Upload the file to Cloudinary
         const uploadResult = await cloudinary.uploader.upload(localPath, { resource_type: "auto" });
